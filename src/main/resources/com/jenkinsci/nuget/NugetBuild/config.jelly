@@ -1,0 +1,8 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:i="jelly:fmt" xmlns:f="/lib/form">
+  <f:entry title="Target" field="target" description="Relative path to a .csproj, .vbproj, or .nuspec file to package and publish.">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="Publish" field="publish" description="Publish to Nuget repository?">
+    <f:checkbox />
+  </f:entry>
+</j:jelly>
