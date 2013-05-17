@@ -1,0 +1,10 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:i="jelly:fmt" xmlns:f="/lib/form">
+    <f:section title="Nuget">
+        <f:entry name="repo" title="Repository">
+            <f:textbox default="http://nuget.org/api/v2" />
+        </f:entry>
+        <f:entry name="apiKey" title="API Key">
+            <f:textbox />
+        </f:entry>
+    </f:section>
+</j:jelly>

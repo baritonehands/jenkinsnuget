@@ -8,16 +8,22 @@ import hudson.Extension;
 import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.model.Node;
+import hudson.util.FormValidation;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.jenkinsci.lib.xtrigger.AbstractTrigger;
 import org.jenkinsci.lib.xtrigger.XTriggerDescriptor;
 import org.jenkinsci.lib.xtrigger.XTriggerException;
 import org.jenkinsci.lib.xtrigger.XTriggerLog;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 /**
  *
  * @author bgregg
  */
 public class NugetTrigger extends AbstractTrigger {
+    @DataBoundConstructor
     public NugetTrigger(String cronTabSpec) throws ANTLRException {
         super(cronTabSpec);
     }
@@ -29,7 +35,7 @@ public class NugetTrigger extends AbstractTrigger {
 
     @Override
     protected boolean requiresWorkspaceForPolling() {
-        return false;
+        return true;
     }
 
     @Override
@@ -58,11 +64,41 @@ public class NugetTrigger extends AbstractTrigger {
     }
     
     @Extension
-    public static class NugetTriggerDescriptor extends XTriggerDescriptor {
-        @Override
-        public String getDisplayName() {
-            return "Nuget Trigger";
+    public static final class NugetTriggerDescriptor extends XTriggerDescriptor {
+        private URL repo;
+        private String apiKey;
+
+        public NugetTriggerDescriptor() {
         }
         
+        @DataBoundConstructor
+        public NugetTriggerDescriptor(String repo, String apiKey) throws MalformedURLException
+        {
+            this.repo = new URL(repo);
+            this.apiKey = apiKey;
+        }
+        
+        @Override
+        public String getDisplayName() {
+            return "Build on Nuget updates";
+        }
+        
+        public URL getRepo() {
+            return repo;
+        }
+        
+        public String getApiKey() {
+            return apiKey;
+        }
+        
+        public FormValidation doCheckRepo(@QueryParameter String repo)
+        {
+            try {
+                new URL(repo);
+            } catch (MalformedURLException ex) {
+                return FormValidation.error("Invalid url");
+            }
+            return FormValidation.ok();
+        }
     }
 }
