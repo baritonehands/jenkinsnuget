@@ -4,7 +4,9 @@
  */
 package com.jenkinsci.nuget;
 import antlr.ANTLRException;
+import com.jenkinsci.nuget.Utils.NugetUpdater;
 import hudson.Extension;
+import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.model.Node;
@@ -26,6 +28,7 @@ public class NugetTrigger extends AbstractTrigger {
     @DataBoundConstructor
     public NugetTrigger(String cronTabSpec) throws ANTLRException {
         super(cronTabSpec);
+        
     }
     
     @Override
@@ -50,17 +53,24 @@ public class NugetTrigger extends AbstractTrigger {
 
     @Override
     protected boolean checkIfModified(Node node, XTriggerLog xtl) throws XTriggerException {
-        return false;
+        AbstractProject project = (AbstractProject) job;
+        NugetUpdater updater = new NugetUpdater(project.getSomeWorkspace(), xtl);
+        return updater.performUpdate();
     }
 
     @Override
     protected String getCause() {
-        return "Cause?";
+        return "Package updated.";
     }
     
     @Override
     public NugetTriggerDescriptor getDescriptor() {
         return (NugetTriggerDescriptor) Hudson.getInstance().getDescriptorOrDie(getClass());
+    }
+
+    @Override
+    public Action getProjectAction() {
+        return new NugetTriggerAction((AbstractProject)job, getLogFile());
     }
     
     @Extension
