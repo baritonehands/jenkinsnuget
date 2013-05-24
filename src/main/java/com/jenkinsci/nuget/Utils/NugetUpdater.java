@@ -116,7 +116,7 @@ public class NugetUpdater {
             return packages.get(id);
         }
         
-        String cmd = String.format("\"%s\" list %s -NonInteractive", new File(wsRoot, ".nuget\\NuGet.exe"), id);
+        String cmd = String.format("\"%s\" list %s -NonInteractive -ConfigFile \"%s\"", new File(wsRoot, ".nuget\\NuGet.exe"), id, new File(wsRoot, ".nuget\\Nuget.config"));
         for (int retried = 0; retried < retryCount; retried++) {    
             log.info(String.format("Running: %s", cmd));
             Process p = Runtime.getRuntime().exec(cmd);
