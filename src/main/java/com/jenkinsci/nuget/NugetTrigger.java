@@ -10,16 +10,15 @@ import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.model.Node;
-import hudson.util.FormValidation;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
+import net.sf.json.JSONObject;
 import org.jenkinsci.lib.xtrigger.AbstractTrigger;
 import org.jenkinsci.lib.xtrigger.XTriggerDescriptor;
 import org.jenkinsci.lib.xtrigger.XTriggerException;
 import org.jenkinsci.lib.xtrigger.XTriggerLog;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
 /**
  *
  * @author bgregg
@@ -54,7 +53,7 @@ public class NugetTrigger extends AbstractTrigger {
     @Override
     protected boolean checkIfModified(Node node, XTriggerLog xtl) throws XTriggerException {
         AbstractProject project = (AbstractProject) job;
-        NugetUpdater updater = new NugetUpdater(project.getSomeWorkspace(), xtl);
+        NugetUpdater updater = new NugetUpdater(project.getSomeWorkspace(), getDescriptor().nugetExe, xtl);
         return updater.performUpdate();
     }
 
@@ -75,17 +74,13 @@ public class NugetTrigger extends AbstractTrigger {
     
     @Extension
     public static final class NugetTriggerDescriptor extends XTriggerDescriptor {
-        private URL repo;
-        private String apiKey;
+        private String nugetExe;
 
-        public NugetTriggerDescriptor() {
-        }
-        
-        @DataBoundConstructor
-        public NugetTriggerDescriptor(String repo, String apiKey) throws MalformedURLException
-        {
-            this.repo = new URL(repo);
-            this.apiKey = apiKey;
+        @Override
+        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+            nugetExe = json.getString("nugetExe");
+            save();
+            return super.configure(req, json); //To change body of generated methods, choose Tools | Templates.
         }
         
         @Override
@@ -93,22 +88,9 @@ public class NugetTrigger extends AbstractTrigger {
             return "Build on Nuget updates";
         }
         
-        public URL getRepo() {
-            return repo;
+        public String getNugetExe() {
+            return nugetExe;
         }
         
-        public String getApiKey() {
-            return apiKey;
-        }
-        
-        public FormValidation doCheckRepo(@QueryParameter String repo)
-        {
-            try {
-                new URL(repo);
-            } catch (MalformedURLException ex) {
-                return FormValidation.error("Invalid url");
-            }
-            return FormValidation.ok();
-        }
     }
 }

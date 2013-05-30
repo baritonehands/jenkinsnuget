@@ -34,14 +34,16 @@ import org.xml.sax.SAXException;
  */
 public class NugetUpdater {
     private static final int retryCount = 3;
+    private String nugetExe;
     private FilePath solutionDir;
     private XTriggerLog log;
     private boolean updated;
     private Map<String, String> packages;
 
-    public NugetUpdater(FilePath solutionDir, XTriggerLog log) {
+    public NugetUpdater(FilePath solutionDir, String nugetExe, XTriggerLog log) {
         this.solutionDir = solutionDir;
         this.log = log;
+        this.nugetExe = nugetExe == null ? ".nuget\\NuGet.exe" : nugetExe;
         this.updated = false;
         this.packages = new HashMap<String, String>();
     }
@@ -116,7 +118,9 @@ public class NugetUpdater {
             return packages.get(id);
         }
         
-        String cmd = String.format("\"%s\" list %s -NonInteractive -ConfigFile \"%s\"", new File(wsRoot, ".nuget\\NuGet.exe"), id, new File(wsRoot, ".nuget\\Nuget.config"));
+        String nuget = new File(nugetExe).isAbsolute() ? nugetExe : new File(wsRoot, nugetExe).getAbsolutePath();
+        
+        String cmd = String.format("\"%s\" list %s -NonInteractive", nuget, id);
         for (int retried = 0; retried < retryCount; retried++) {    
             log.info(String.format("Running: %s", cmd));
             Process p = Runtime.getRuntime().exec(cmd);
