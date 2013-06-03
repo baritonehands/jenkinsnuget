@@ -6,10 +6,36 @@
     <version>1.514</version><!-- which version of Jenkins is this plugin built against? -->
   </parent>
 
-  <groupId>com.jenkins-ci</groupId>
   <artifactId>nuget</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>hpi</packaging>
+  <name>Jenkins Nuget Plugin</name>
+  <description>NuGet package updates trigger Jenkins builds</description>
+  <url>http://wiki.jenkins-ci.org/display/JENKINS/Nuget+Plugin</url>
+  
+  <scm>
+    <connection>scm:git:ssh://github.com/jenkinsci/nuget-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/nuget-plugin.git</developerConnection>
+    <url>https://github.com/jenkinsci/nuget-plugin</url>
+  </scm>
+  
+  <developers>
+    <developer>
+      <id>baritonehands</id>
+      <name>Brian Gregg</name>
+      <email>biscuitalmighty@gmail.com</email>
+    </developer>
+  </developers>
+  
+  <build> 
+     <plugins> 
+       <plugin> 
+         <groupId>org.jenkins-ci.tools</groupId> 
+         <artifactId>maven-hpi-plugin</artifactId> 
+         <version>1.95</version> 
+       </plugin> 
+     </plugins> 
+   </build> 
 
   <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
   <repositories>
