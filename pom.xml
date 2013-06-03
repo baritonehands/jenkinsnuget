@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>nuget</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.1</version>
   <packaging>hpi</packaging>
   <name>Jenkins Nuget Plugin</name>
   <description>NuGet package updates trigger Jenkins builds</description>
