@@ -7,16 +7,16 @@
   </parent>
 
   <artifactId>nuget</artifactId>
-  <version>0.1</version>
+  <version>0.1-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Jenkins Nuget Plugin</name>
   <description>NuGet package updates trigger Jenkins builds</description>
   <url>http://wiki.jenkins-ci.org/display/JENKINS/Nuget+Plugin</url>
   
   <scm>
-    <connection>scm:git:ssh://github.com/jenkinsci/nuget-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/nuget-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/nuget-plugin</url>
+    <connection>scm:git:ssh://github.com/baritonehands/jenkinsnuget.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/baritonehands/jenkinsnuget.git</developerConnection>
+    <url>https://github.com/baritonehands/jenkinsnuget</url>
   </scm>
   
   <developers>
