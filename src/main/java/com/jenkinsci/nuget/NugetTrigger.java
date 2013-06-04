@@ -64,7 +64,7 @@ public class NugetTrigger extends AbstractTrigger {
     
     @Override
     public NugetTriggerDescriptor getDescriptor() {
-        return (NugetTriggerDescriptor) Hudson.getInstance().getDescriptorOrDie(getClass());
+        return (NugetTriggerDescriptor)super.getDescriptor();
     }
 
     @Override
@@ -76,6 +76,11 @@ public class NugetTrigger extends AbstractTrigger {
     public static final class NugetTriggerDescriptor extends XTriggerDescriptor {
         private String nugetExe;
 
+        public NugetTriggerDescriptor() {
+            super();
+            load();
+        }
+        
         @Override
         public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
             nugetExe = json.getString("nugetExe");
