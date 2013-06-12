@@ -17,6 +17,7 @@ import org.jenkinsci.lib.xtrigger.AbstractTrigger;
 import org.jenkinsci.lib.xtrigger.XTriggerDescriptor;
 import org.jenkinsci.lib.xtrigger.XTriggerException;
 import org.jenkinsci.lib.xtrigger.XTriggerLog;
+import org.jenkinsci.plugins.nuget.NugetCause;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 /**
@@ -42,7 +43,7 @@ public class NugetTrigger extends AbstractTrigger {
 
     @Override
     protected String getName() {
-        return "Nuget";
+        return NugetCause.NAME;
     }
 
     @Override
@@ -59,7 +60,7 @@ public class NugetTrigger extends AbstractTrigger {
 
     @Override
     protected String getCause() {
-        return "Package updated.";
+        return NugetCause.CAUSE;
     }
     
     @Override
