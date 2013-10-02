@@ -33,93 +33,100 @@ import org.xml.sax.SAXException;
  * @author bgregg
  */
 public class NugetUpdater {
-    private static final int retryCount = 3;
-    private String nugetExe;
     private FilePath solutionDir;
+    private Updater updater;
     private XTriggerLog log;
-    private boolean updated;
-    private Map<String, String> packages;
 
     public NugetUpdater(FilePath solutionDir, String nugetExe, XTriggerLog log) {
         this.solutionDir = solutionDir;
         this.log = log;
-        this.nugetExe = nugetExe == null ? ".nuget\\NuGet.exe" : nugetExe;
-        this.updated = false;
-        this.packages = new HashMap<String, String>();
+        this.updater = new Updater(nugetExe, log);
     }
 
     public boolean performUpdate() {
         //String solutionGlob = "glob:" + file.getAbsolutePath() + "\\*.sln";
         try {
-            checkVersions();
+            return checkVersions();
         } catch (Throwable ex) {
             log.error(ex.toString());
             return false;
         }
-        return updated;
     }
 
-    private void checkVersions() throws InterruptedException, IOException {
-        updated = false;
-        solutionDir.act(new FileCallable<Void>() {
-            public Void invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
-                try {
-                    final String root = file.getAbsolutePath();
-                    DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                    final DocumentBuilder builder = dbFactory.newDocumentBuilder();
-                    
-                    Files.walkFileTree(Paths.get(file.getPath()), new SimpleFileVisitor<Path>() {
-                        @Override
-                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                            if (file.getFileName().toString().equalsIgnoreCase("packages.config")) {
-                                log.info(String.format("Checking packages file: %s", file.toAbsolutePath().toString()));
-                                try {
-                                    Document doc = builder.parse(file.toFile());
-                                    
-                                    doc.getDocumentElement().normalize();
-                                    NodeList elems = doc.getElementsByTagName("package");
-                                    for(int idx = 0; idx < elems.getLength(); idx++) {
-                                        Element p = (Element)elems.item(idx);
-                                        String id = p.getAttribute("id");
-                                        String version = p.getAttribute("version");
-                                        String latest = getPackageVersion(root, id);
-                                        
-                                        if(latest == null || !version.equals(latest)) {
-                                            log.info(String.format("Package %s v%s should update to v%s.", id, version, latest));
-                                            updated = true;
-                                            return FileVisitResult.TERMINATE;
-                                        }
-                                    }
-                                } catch (SAXException ex) {
-                                    log.error(ex.toString());
+    private boolean checkVersions() throws InterruptedException, IOException {
+        return solutionDir.act(updater);
+    }   
+}
+
+class Updater implements FileCallable<Boolean> {
+    private String nugetExe;
+    private XTriggerLog log;
+    private Map<String, String> packages = new HashMap<String, String>();
+    private static final int retryCount = 3;
+    
+    public Updater(String nugetExe, XTriggerLog log)
+    {
+        this.log = log;
+        this.nugetExe = nugetExe == null ? ".nuget\\NuGet.exe" : nugetExe;
+    }
+
+    public Boolean invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
+        final boolean[] updated = new boolean[] { false };
+        try {
+            final String root = file.getAbsolutePath();
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            final DocumentBuilder builder = dbFactory.newDocumentBuilder();
+
+            Files.walkFileTree(Paths.get(file.getPath()), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (file.getFileName().toString().equalsIgnoreCase("packages.config")) {
+                        log.info(String.format("Checking packages file: %s", file.toAbsolutePath().toString()));
+                        try {
+                            Document doc = builder.parse(file.toFile());
+
+                            doc.getDocumentElement().normalize();
+                            NodeList elems = doc.getElementsByTagName("package");
+                            for(int idx = 0; idx < elems.getLength(); idx++) {
+                                Element p = (Element)elems.item(idx);
+                                String id = p.getAttribute("id");
+                                String version = p.getAttribute("version");
+                                String latest = getPackageVersion(root, id);
+
+                                if(latest == null || !version.equals(latest)) {
+                                    log.info(String.format("Package %s v%s should update to v%s.", id, version, latest));
+                                    updated[0] = true;
+                                    return FileVisitResult.TERMINATE;
                                 }
                             }
-                            return FileVisitResult.CONTINUE;
+                        } catch (SAXException ex) {
+                            log.error(ex.toString());
                         }
-
-                        @Override
-                        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                            log.error(exc.toString());
-                            return FileVisitResult.CONTINUE;
-                        }
-                    });
-                } catch (ParserConfigurationException ex) {
-                    log.error(ex.toString());
+                    }
+                    return FileVisitResult.CONTINUE;
                 }
-                return null;
-            }
-        });
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    log.error(exc.toString());
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (ParserConfigurationException ex) {
+            log.error(ex.toString());
+        }
+        return Boolean.valueOf(updated[0]);
     }
-    
+
     private String getPackageVersion(String wsRoot, String id) throws IOException {
         String line;        
 
         if(packages.containsKey(id)) {
             return packages.get(id);
         }
-        
+
         String nuget = new File(nugetExe).isAbsolute() ? nugetExe : new File(wsRoot, nugetExe).getAbsolutePath();
-        
+
         String cmd = String.format("\"%s\" list %s -NonInteractive", nuget, id);
         for (int retried = 0; retried < retryCount; retried++) {    
             log.info(String.format("Running: %s", cmd));
