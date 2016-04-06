@@ -1,16 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.jenkinsci.nuget.Utils;
 
 import hudson.FilePath;
-import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,6 +23,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import jenkins.MasterToSlaveFileCallable;
 
 /**
  *
@@ -44,7 +41,6 @@ public class NugetUpdater {
     }
 
     public boolean performUpdate() {
-        //String solutionGlob = "glob:" + file.getAbsolutePath() + "\\*.sln";
         try {
             return checkVersions();
         } catch (Throwable ex) {
@@ -55,13 +51,13 @@ public class NugetUpdater {
 
     private boolean checkVersions() throws InterruptedException, IOException {
         return solutionDir.act(updater);
-    }   
+    }
 }
 
-class Updater implements FileCallable<Boolean> {
+class Updater extends MasterToSlaveFileCallable<Boolean> {
     private String nugetExe;
     private XTriggerLog log;
-    private Map<String, String> packages = new HashMap<String, String>();
+    private Map<String, String> packages = new HashMap<>();
     private static final int retryCount = 3;
     
     public Updater(String nugetExe, XTriggerLog log)
@@ -79,16 +75,17 @@ class Updater implements FileCallable<Boolean> {
 
             Files.walkFileTree(Paths.get(file.getPath()), new SimpleFileVisitor<Path>() {
                 @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if (file.getFileName().toString().equalsIgnoreCase("packages.config")) {
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+                    Path fileName = file.getFileName();
+                    if (fileName != null && fileName.toString().equalsIgnoreCase("packages.config")) {
                         log.info(String.format("Checking packages file: %s", file.toAbsolutePath().toString()));
                         try {
                             Document doc = builder.parse(file.toFile());
 
                             doc.getDocumentElement().normalize();
-                            NodeList elems = doc.getElementsByTagName("package");
-                            for(int idx = 0; idx < elems.getLength(); idx++) {
-                                Element p = (Element)elems.item(idx);
+                            NodeList packageNodes = doc.getElementsByTagName("package");
+                            for(int idx = 0; idx < packageNodes.getLength(); idx++) {
+                                Element p = (Element)packageNodes.item(idx);
                                 String id = p.getAttribute("id");
                                 String version = p.getAttribute("version");
                                 String latest = getPackageVersion(root, id);
@@ -115,7 +112,7 @@ class Updater implements FileCallable<Boolean> {
         } catch (ParserConfigurationException ex) {
             log.error(ex.toString());
         }
-        return Boolean.valueOf(updated[0]);
+        return updated[0];
     }
 
     private String getPackageVersion(String wsRoot, String id) throws IOException {
@@ -128,32 +125,46 @@ class Updater implements FileCallable<Boolean> {
         String nuget = new File(nugetExe).isAbsolute() ? nugetExe : new File(wsRoot, nugetExe).getAbsolutePath();
 
         String cmd = String.format("\"%s\" list %s -NonInteractive", nuget, id);
-        for (int retried = 0; retried < retryCount; retried++) {    
+        for (int retried = 0; retried < retryCount; retried++) {
             log.info(String.format("Running: %s", cmd));
             Process p = Runtime.getRuntime().exec(cmd);
-            BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            BufferedReader stderr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-            while ((line = stdout.readLine()) != null) {
-                log.info(line);
-                String[] parts = line.split(" ", 2);
-                if(parts.length == 2 && parts[0].equalsIgnoreCase(id)) {
-                    packages.put(id, parts[1]);
-                    return parts[1];
+            BufferedReader stdOut = null;
+            BufferedReader stdErr = null;
+            try {
+                stdOut = new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.defaultCharset()));
+                stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream(), Charset.defaultCharset()));
+
+                while ((line = stdOut.readLine()) != null) {
+                    log.info(line);
+                    String[] parts = line.split(" ", 2);
+                    if(parts.length == 2 && parts[0].equalsIgnoreCase(id)) {
+                        packages.put(id, parts[1]);
+                        return parts[1];
+                    }
+                }
+                while ((line = stdErr.readLine()) != null) {
+                    log.error(line);
                 }
             }
-            stdout.close();
-            while ((line = stderr.readLine()) != null) {
-                log.error(line);
+            finally {
+                if (stdOut != null) {
+                    stdOut.close();
+                }
+                if (stdErr != null) {
+                    stdErr.close();
+                }
             }
-            stderr.close();
+
             try {
                 p.waitFor();
                 break;
             } catch (InterruptedException ex) {
                 log.error(ex.toString());
-                log.info(String.format("Retrying: %i", retried));
+                log.info(String.format("Retrying: %d", retried));
             }
         }
         return null;
     }
+
+
 }

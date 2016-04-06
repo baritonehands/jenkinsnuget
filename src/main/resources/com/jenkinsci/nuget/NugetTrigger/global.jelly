@@ -1,3 +1,4 @@
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:i="jelly:fmt" xmlns:f="/lib/form">
     <f:section title="Nuget">
         <f:entry title="NuGet command line executable" description="If empty, will default to $${WORKSPACE}\.nuget\NuGet.exe">

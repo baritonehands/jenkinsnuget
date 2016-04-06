@@ -1,6 +1,4 @@
-<!--
-  This view is used to render the installed plugins page.
--->
+<?jelly escape-by-default='true'?>
 <div>
   This plugin is to trigger a build when a NuGet dependency has an updated version.
 </div>

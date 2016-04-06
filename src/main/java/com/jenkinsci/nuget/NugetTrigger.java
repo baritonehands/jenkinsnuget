@@ -1,17 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.jenkinsci.nuget;
 import antlr.ANTLRException;
 import com.jenkinsci.nuget.Utils.NugetUpdater;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
-import hudson.model.Hudson;
 import hudson.model.Node;
 import java.io.File;
-import java.net.MalformedURLException;
+import java.util.Collection;
+import java.util.Collections;
+
 import net.sf.json.JSONObject;
 import org.jenkinsci.lib.xtrigger.AbstractTrigger;
 import org.jenkinsci.lib.xtrigger.XTriggerDescriptor;
@@ -69,8 +67,8 @@ public class NugetTrigger extends AbstractTrigger {
     }
 
     @Override
-    public Action getProjectAction() {
-        return new NugetTriggerAction((AbstractProject)job, getLogFile());
+    public Collection<? extends Action> getProjectActions() {
+        return Collections.singleton(new NugetTriggerAction(job, getLogFile()));
     }
     
     @Extension
@@ -86,7 +84,7 @@ public class NugetTrigger extends AbstractTrigger {
         public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
             nugetExe = json.getString("nugetExe");
             save();
-            return super.configure(req, json); //To change body of generated methods, choose Tools | Templates.
+            return super.configure(req, json);
         }
         
         @Override
