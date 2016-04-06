@@ -50,6 +50,10 @@ public class NugetUpdater {
     }
 
     private boolean checkVersions() throws InterruptedException, IOException {
+        if (solutionDir == null) {
+            log.error("No workspace found. Ignoring trigger.");
+            return false;
+        }
         return solutionDir.act(updater);
     }
 }
