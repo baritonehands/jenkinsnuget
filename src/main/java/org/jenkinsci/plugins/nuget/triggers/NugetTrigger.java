@@ -59,7 +59,7 @@ public class NugetTrigger extends AbstractTrigger {
 
     @Override
     protected String getCause() {
-        return NugetCause.CAUSE;
+        return Messages.NugetCause_Cause();
     }
     
     @Override
@@ -83,7 +83,7 @@ public class NugetTrigger extends AbstractTrigger {
         
         @Override
         public String getDisplayName() {
-            return "Build on Nuget updates";
+            return Messages.NugetTrigger_DiplayName();
         }
 
         @Deprecated
