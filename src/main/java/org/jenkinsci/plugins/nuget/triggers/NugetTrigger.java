@@ -1,8 +1,12 @@
-package com.jenkinsci.nuget;
+package org.jenkinsci.plugins.nuget.triggers;
 import antlr.ANTLRException;
-import com.jenkinsci.nuget.Utils.NugetUpdater;
+import hudson.XmlFile;
+import hudson.model.Items;
+import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.nuget.Messages;
+import org.jenkinsci.plugins.nuget.NugetCause;
+import org.jenkinsci.plugins.nuget.Utils.NugetUpdater;
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Node;
@@ -10,14 +14,12 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.sf.json.JSONObject;
 import org.jenkinsci.lib.xtrigger.AbstractTrigger;
 import org.jenkinsci.lib.xtrigger.XTriggerDescriptor;
 import org.jenkinsci.lib.xtrigger.XTriggerException;
 import org.jenkinsci.lib.xtrigger.XTriggerLog;
-import org.jenkinsci.plugins.nuget.NugetCause;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
+
 /**
  *
  * @author bgregg
@@ -26,7 +28,6 @@ public class NugetTrigger extends AbstractTrigger {
     @DataBoundConstructor
     public NugetTrigger(String cronTabSpec) throws ANTLRException {
         super(cronTabSpec);
-        
     }
     
     @Override
@@ -81,20 +82,18 @@ public class NugetTrigger extends AbstractTrigger {
         }
         
         @Override
-        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
-            nugetExe = json.getString("nugetExe");
-            save();
-            return super.configure(req, json);
-        }
-        
-        @Override
         public String getDisplayName() {
             return "Build on Nuget updates";
         }
-        
+
+        @Deprecated
         public String getNugetExe() {
             return nugetExe;
         }
-        
+
+        @Override
+        public XmlFile getConfigFile() {
+            return new XmlFile(Items.XSTREAM2, new File(Jenkins.getInstance().getRootDir(), "com.jenkinsci.nuget.NugetTrigger.xml"));
+        }
     }
 }

@@ -1,7 +1,8 @@
-package com.jenkinsci.nuget.Utils;
+package org.jenkinsci.plugins.nuget.Utils;
 
 import hudson.FilePath;
 import hudson.remoting.VirtualChannel;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.jenkinsci.lib.xtrigger.XTriggerLog;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -26,7 +28,6 @@ import org.xml.sax.SAXException;
 import jenkins.MasterToSlaveFileCallable;
 
 /**
- *
  * @author bgregg
  */
 public class NugetUpdater {
@@ -63,15 +64,14 @@ class Updater extends MasterToSlaveFileCallable<Boolean> {
     private XTriggerLog log;
     private Map<String, String> packages = new HashMap<>();
     private static final int retryCount = 3;
-    
-    public Updater(String nugetExe, XTriggerLog log)
-    {
+
+    public Updater(String nugetExe, XTriggerLog log) {
         this.log = log;
         this.nugetExe = nugetExe == null ? ".nuget\\NuGet.exe" : nugetExe;
     }
 
     public Boolean invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
-        final boolean[] updated = new boolean[] { false };
+        final boolean[] updated = new boolean[]{false};
         try {
             final String root = file.getAbsolutePath();
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -88,13 +88,13 @@ class Updater extends MasterToSlaveFileCallable<Boolean> {
 
                             doc.getDocumentElement().normalize();
                             NodeList packageNodes = doc.getElementsByTagName("package");
-                            for(int idx = 0; idx < packageNodes.getLength(); idx++) {
-                                Element p = (Element)packageNodes.item(idx);
+                            for (int idx = 0; idx < packageNodes.getLength(); idx++) {
+                                Element p = (Element) packageNodes.item(idx);
                                 String id = p.getAttribute("id");
                                 String version = p.getAttribute("version");
                                 String latest = getPackageVersion(root, id);
 
-                                if(latest == null || !version.equals(latest)) {
+                                if (latest == null || !version.equals(latest)) {
                                     log.info(String.format("Package %s v%s should update to v%s.", id, version, latest));
                                     updated[0] = true;
                                     return FileVisitResult.TERMINATE;
@@ -120,9 +120,9 @@ class Updater extends MasterToSlaveFileCallable<Boolean> {
     }
 
     private String getPackageVersion(String wsRoot, String id) throws IOException {
-        String line;        
+        String line;
 
-        if(packages.containsKey(id)) {
+        if (packages.containsKey(id)) {
             return packages.get(id);
         }
 
@@ -141,7 +141,7 @@ class Updater extends MasterToSlaveFileCallable<Boolean> {
                 while ((line = stdOut.readLine()) != null) {
                     log.info(line);
                     String[] parts = line.split(" ", 2);
-                    if(parts.length == 2 && parts[0].equalsIgnoreCase(id)) {
+                    if (parts.length == 2 && parts[0].equalsIgnoreCase(id)) {
                         packages.put(id, parts[1]);
                         return parts[1];
                     }
@@ -149,8 +149,7 @@ class Updater extends MasterToSlaveFileCallable<Boolean> {
                 while ((line = stdErr.readLine()) != null) {
                     log.error(line);
                 }
-            }
-            finally {
+            } finally {
                 if (stdOut != null) {
                     stdOut.close();
                 }

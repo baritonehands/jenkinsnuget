@@ -1,4 +1,4 @@
-package com.jenkinsci.nuget;
+package org.jenkinsci.plugins.nuget.triggers;
 
 import hudson.Util;
 import hudson.console.AnnotatedLargeText;
