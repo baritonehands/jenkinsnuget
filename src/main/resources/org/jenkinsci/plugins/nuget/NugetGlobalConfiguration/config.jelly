@@ -1,0 +1,33 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:i="jelly:fmt" xmlns:f="/lib/form">
+  <f:section title="Nuget">
+    <f:entry title="${%CommandLineExecutable}" description="${%CommandLineExecutableDescription}">
+        <f:textbox field="nugetExe" />
+    </f:entry>
+    <f:entry title="${%NugetPublications}" description="${%NugetPublicationsDescription}">
+      <div>
+        <f:repeatable var="publication" items="${instance.publications}" add="${%AddPublication}">
+          <table width="100%">
+            <f:entry title="${%Name}">
+              <f:textbox name="name" value="${publication.getName()}" checkUrl="'${rootURL}/descriptor/NugetGlobalConfiguration/checkMandatory?value='+escape(this.value)"/>
+            </f:entry>
+
+            <f:entry title="${%Url}">
+              <f:textbox name="url" value="${publication.getUrl()}" checkUrl="'${rootURL}/descriptor/NugetGlobalConfiguration/checkMandatory?value='+escape(this.value)"/>
+            </f:entry>
+
+            <f:entry title="${%ApiKey}">
+              <f:password name="apiKey" value="${publication.getApiKey()}" checkUrl="'${rootURL}/descriptor/NugetGlobalConfiguration/checkMandatory?value='+escape(this.value)"/>
+            </f:entry>
+
+            <f:entry title="">
+              <div align="right">
+                <f:repeatableDeleteButton value="${%DeletePublication}"/>
+              </div>
+            </f:entry>
+          </table>
+        </f:repeatable>
+      </div>
+    </f:entry>
+  </f:section>
+</j:jelly>

@@ -1,10 +1,13 @@
 package org.jenkinsci.plugins.nuget.triggers;
 import antlr.ANTLRException;
+import hudson.FilePath;
 import hudson.XmlFile;
 import hudson.model.Items;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.nuget.Messages;
 import org.jenkinsci.plugins.nuget.NugetCause;
+import org.jenkinsci.plugins.nuget.NugetGlobalConfiguration;
 import org.jenkinsci.plugins.nuget.Utils.NugetUpdater;
 import hudson.Extension;
 import hudson.model.AbstractProject;
@@ -53,7 +56,8 @@ public class NugetTrigger extends AbstractTrigger {
     @Override
     protected boolean checkIfModified(Node node, XTriggerLog xtl) throws XTriggerException {
         AbstractProject project = (AbstractProject) job;
-        NugetUpdater updater = new NugetUpdater(project.getSomeWorkspace(), getDescriptor().nugetExe, xtl);
+        NugetGlobalConfiguration configuration = GlobalConfiguration.all().get(NugetGlobalConfiguration.class);
+        NugetUpdater updater = new NugetUpdater(project.getSomeWorkspace(), configuration, xtl);
         return updater.performUpdate();
     }
 
@@ -72,7 +76,7 @@ public class NugetTrigger extends AbstractTrigger {
         return Collections.singleton(new NugetTriggerAction(job, getLogFile()));
     }
     
-    @Extension
+    @Extension(ordinal=1000)
     public static final class NugetTriggerDescriptor extends XTriggerDescriptor {
         private String nugetExe;
 
@@ -93,7 +97,11 @@ public class NugetTrigger extends AbstractTrigger {
 
         @Override
         public XmlFile getConfigFile() {
-            return new XmlFile(Items.XSTREAM2, new File(Jenkins.getInstance().getRootDir(), "com.jenkinsci.nuget.NugetTrigger.xml"));
+            Jenkins jenkins = Jenkins.getInstance();
+            if (jenkins == null) {
+                return null;
+            }
+            return new XmlFile(Items.XSTREAM2, new File(jenkins.getRootDir(), "com.jenkinsci.nuget.NugetTrigger.xml"));
         }
     }
 }

@@ -30,13 +30,17 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:ssh://github.com/baritonehands/jenkinsnuget.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/baritonehands/jenkinsnuget.git</developerConnection>
-    <url>https://github.com/baritonehands/jenkinsnuget</url>
-    <tag>HEAD</tag>
+    <connection>scm:git:git://github.com/jenkinsci/nuget-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/nuget-plugin.git</developerConnection>
+    <url>https://github.com/jenkinsci/nuget-plugin</url>
   </scm>
   
   <developers>
+    <developer>
+      <id>greybird</id>
+      <name>Arnaud TAMAILLON</name>
+      <email>arnaud.dev@gmail.com</email>
+    </developer>
     <developer>
       <id>baritonehands</id>
       <name>Brian Gregg</name>

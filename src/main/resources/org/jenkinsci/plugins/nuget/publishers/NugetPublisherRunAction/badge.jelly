@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+  <l:icon class="icon-nuget icon-sm" alt="${it.name}" title="${it.name}"/>
+</j:jelly>
