@@ -1,25 +1,28 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.jenkinsci.nuget;
+package org.jenkinsci.plugins.nuget.triggers;
 import antlr.ANTLRException;
-import com.jenkinsci.nuget.Utils.NugetUpdater;
+import hudson.FilePath;
+import hudson.XmlFile;
+import hudson.model.Items;
+import jenkins.model.GlobalConfiguration;
+import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.nuget.Messages;
+import org.jenkinsci.plugins.nuget.NugetCause;
+import org.jenkinsci.plugins.nuget.NugetGlobalConfiguration;
+import org.jenkinsci.plugins.nuget.Utils.NugetUpdater;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
-import hudson.model.Hudson;
 import hudson.model.Node;
 import java.io.File;
-import java.net.MalformedURLException;
-import net.sf.json.JSONObject;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.jenkinsci.lib.xtrigger.AbstractTrigger;
 import org.jenkinsci.lib.xtrigger.XTriggerDescriptor;
 import org.jenkinsci.lib.xtrigger.XTriggerException;
 import org.jenkinsci.lib.xtrigger.XTriggerLog;
-import org.jenkinsci.plugins.nuget.NugetCause;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
+
 /**
  *
  * @author bgregg
@@ -28,7 +31,6 @@ public class NugetTrigger extends AbstractTrigger {
     @DataBoundConstructor
     public NugetTrigger(String cronTabSpec) throws ANTLRException {
         super(cronTabSpec);
-        
     }
     
     @Override
@@ -54,13 +56,14 @@ public class NugetTrigger extends AbstractTrigger {
     @Override
     protected boolean checkIfModified(Node node, XTriggerLog xtl) throws XTriggerException {
         AbstractProject project = (AbstractProject) job;
-        NugetUpdater updater = new NugetUpdater(project.getSomeWorkspace(), getDescriptor().nugetExe, xtl);
+        NugetGlobalConfiguration configuration = GlobalConfiguration.all().get(NugetGlobalConfiguration.class);
+        NugetUpdater updater = new NugetUpdater(project.getSomeWorkspace(), configuration, xtl);
         return updater.performUpdate();
     }
 
     @Override
     protected String getCause() {
-        return NugetCause.CAUSE;
+        return Messages.NugetCause_Cause();
     }
     
     @Override
@@ -69,11 +72,11 @@ public class NugetTrigger extends AbstractTrigger {
     }
 
     @Override
-    public Action getProjectAction() {
-        return new NugetTriggerAction((AbstractProject)job, getLogFile());
+    public Collection<? extends Action> getProjectActions() {
+        return Collections.singleton(new NugetTriggerAction(job, getLogFile()));
     }
     
-    @Extension
+    @Extension(ordinal=1000)
     public static final class NugetTriggerDescriptor extends XTriggerDescriptor {
         private String nugetExe;
 
@@ -83,20 +86,22 @@ public class NugetTrigger extends AbstractTrigger {
         }
         
         @Override
-        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
-            nugetExe = json.getString("nugetExe");
-            save();
-            return super.configure(req, json); //To change body of generated methods, choose Tools | Templates.
-        }
-        
-        @Override
         public String getDisplayName() {
-            return "Build on Nuget updates";
+            return Messages.NugetTrigger_DiplayName();
         }
-        
+
+        @Deprecated
         public String getNugetExe() {
             return nugetExe;
         }
-        
+
+        @Override
+        public XmlFile getConfigFile() {
+            Jenkins jenkins = Jenkins.getInstance();
+            if (jenkins == null) {
+                return null;
+            }
+            return new XmlFile(Items.XSTREAM2, new File(jenkins.getRootDir(), "com.jenkinsci.nuget.NugetTrigger.xml"));
+        }
     }
 }
