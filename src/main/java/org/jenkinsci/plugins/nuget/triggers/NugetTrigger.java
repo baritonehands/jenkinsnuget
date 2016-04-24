@@ -55,6 +55,9 @@ public class NugetTrigger extends AbstractTrigger {
 
     @Override
     protected boolean checkIfModified(Node node, XTriggerLog xtl) throws XTriggerException {
+        if (job == null) {
+            return false;
+        }
         AbstractProject project = (AbstractProject) job;
         NugetGlobalConfiguration configuration = GlobalConfiguration.all().get(NugetGlobalConfiguration.class);
         NugetUpdater updater = new NugetUpdater(project.getSomeWorkspace(), configuration, xtl);
@@ -73,6 +76,9 @@ public class NugetTrigger extends AbstractTrigger {
 
     @Override
     public Collection<? extends Action> getProjectActions() {
+        if (job == null) {
+            return Collections.emptyList();
+        }
         return Collections.singleton(new NugetTriggerAction(job, getLogFile()));
     }
     
