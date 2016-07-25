@@ -28,13 +28,13 @@ import java.util.logging.Logger;
  */
 public class NugetPublisher extends Recorder {
 
-    private static final Logger logger = Logger.getLogger(NugetPublisher.class.getName());
+    protected static final Logger logger = Logger.getLogger(NugetPublisher.class.getName());
 
-    private String name;
-    private String packagesPattern;
-    private String publishPath;
-    private String nugetPublicationName;
-    private String packagesExclusionPattern;
+    protected String name;
+    protected String packagesPattern;
+    protected String publishPath;
+    protected String nugetPublicationName;
+    protected String packagesExclusionPattern;
 
     @DataBoundConstructor
     public NugetPublisher(String name, String packagesPattern, String publishPath, String nugetPublicationName, String packagesExclusionPattern) {
@@ -60,17 +60,23 @@ public class NugetPublisher extends Recorder {
         String expandedPublishPath = Util.replaceMacro(publishPath, build.getEnvironment(listener));
         
         listener.getLogger().format("Starting %s publication%n", expandedName);
-        FilePath workspaceRoot = getWorkspace(build);
         NugetGlobalConfiguration configuration = GlobalConfiguration.all().get(NugetGlobalConfiguration.class);
         NugetPublication publication = NugetPublication.get(nugetPublicationName);
         NugetPublisherCallable callable = new NugetPublisherCallable(pattern, exclusionPattern, listener, configuration, expandedPublishPath, publication);
-        List<PublicationResult> results = workspaceRoot.act(callable);
+
+        FilePath filesRoot = this.getFilesRoot(build);
+
+        List<PublicationResult> results = filesRoot.act(callable);
         if (results.size() > 0) {
             build.addAction(new NugetPublisherRunAction(expandedName, results));
         }
         listener.getLogger().format("Ended %s publication%n", expandedName);
         checkErrors(results);
         return true;
+    }
+
+    protected FilePath getFilesRoot(AbstractBuild<?, ?> build) {
+        return getWorkspace(build);
     }
 
     private void checkErrors(List<PublicationResult> results) throws AbortException {
@@ -82,7 +88,7 @@ public class NugetPublisher extends Recorder {
     }
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "We shoud have.")
-    private FilePath getWorkspace(AbstractBuild<?, ?> build) {
+    protected FilePath getWorkspace(AbstractBuild<?, ?> build) {
         return build.getWorkspace();
     }
 
@@ -109,6 +115,8 @@ public class NugetPublisher extends Recorder {
     @Extension
     public static final class NugetPublisherDescriptor extends BuildStepDescriptor<Publisher> {
 
+        private static final String PROMOTION_JOB_TYPE = "hudson.plugins.promoted_builds.PromotionProcess";
+
         public NugetPublisherDescriptor() {
             super(NugetPublisher.class);
             load();
@@ -116,7 +124,7 @@ public class NugetPublisher extends Recorder {
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> type) {
-            return true;
+            return !PROMOTION_JOB_TYPE.equals(type.getCanonicalName());
         }
 
         @Override

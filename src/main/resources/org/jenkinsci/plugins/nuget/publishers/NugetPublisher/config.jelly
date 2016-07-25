@@ -1,29 +1,44 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-  <j:set var="nugetPublications" value="${descriptor.publications}"/>
-  <f:entry title="${%Name}" field="name">
-    <f:textbox value="${instance.name}"/>
-  </f:entry>
-  <j:if test="${empty(nugetPublications)}">
-    <!-- no SonarQube installation is configured, so warn the user now -->
-    <f:entry title="${%NugetPublication}">
-      <div class="error">${%NugetPublication.error(rootURL)}</div>
+    <j:set var="nugetPublications" value="${descriptor.publications}"/>
+    <f:entry title="${%Name}" field="name">
+        <f:textbox value="${instance.name}"/>
     </f:entry>
-  </j:if>
-  <f:entry title="${%NugetPublication}">
-    <select class="setting-input" name="nugetPublicationName">
-      <j:forEach var="publication" items="${nugetPublications}">
-        <f:option value="${publication.name}" selected="${publication.name==instance.nugetPublicationName}">${publication.name}</f:option>
-      </j:forEach>
-    </select>
-  </f:entry>
-  <f:entry title="${%FilePattern}" description="${%FilePatternDescription}" field="packagesPattern">
-    <f:textbox value="${instance.packagesPattern}"/>
-  </f:entry>
-  <f:entry title="${%FileExclusionPattern}" description="${%FileExclusionPatternDescription}" field="packagesExclusionPattern">
-    <f:textbox value="${instance.packagesExclusionPattern}"/>
-  </f:entry>
-  <f:entry title="${%publishPath}" description="${%publishPathDescription}" field="publishPath">
-    <f:textbox value="${instance.publishPath}"/>
-  </f:entry>
+    <j:if test="${empty(nugetPublications)}">
+        <!-- no SonarQube installation is configured, so warn the user now -->
+        <f:entry title="${%NugetPublication}">
+            <div class="error">${%NugetPublication.error(rootURL)}</div>
+        </f:entry>
+    </j:if>
+    <f:entry title="${%NugetPublication}">
+        <select class="setting-input" name="nugetPublicationName">
+            <j:forEach var="publication" items="${nugetPublications}">
+                <f:option value="${publication.name}" selected="${publication.name==instance.nugetPublicationName}">${publication.name}</f:option>
+            </j:forEach>
+        </select>
+    </f:entry>
+    <j:choose>
+        <j:when test="${inPromotion}">
+            <f:entry title="${%UseWorkspaceInPromotion}" field="useWorkspaceInPromotion">
+                <f:checkbox value="${instance.useWorkspaceInPromotion}"/>
+            </f:entry>
+            <f:entry title="${%FilePattern}" description="${%FilePatternDescriptionPromotion}" field="packagesPattern">
+                <f:textbox value="${instance.packagesPattern}"/>
+            </f:entry>
+            <f:entry title="${%FileExclusionPattern}" description="${%FilePatternDescriptionPromotion}" field="packagesExclusionPattern">
+                <f:textbox value="${instance.packagesExclusionPattern}"/>
+            </f:entry>
+        </j:when>
+        <j:otherwise>
+            <f:entry title="${%FilePattern}" description="${%FilePatternDescription}" field="packagesPattern">
+                <f:textbox value="${instance.packagesPattern}"/>
+            </f:entry>
+            <f:entry title="${%FileExclusionPattern}" description="${%FileExclusionPatternDescription}" field="packagesExclusionPattern">
+                <f:textbox value="${instance.packagesExclusionPattern}"/>
+            </f:entry>
+	  <f:entry title="${%publishPath}" description="${%publishPathDescription}" field="publishPath">
+	    <f:textbox value="${instance.publishPath}"/>
+	  </f:entry>
+  	</j:otherwise>
+    </j:choose>
 </j:jelly>
