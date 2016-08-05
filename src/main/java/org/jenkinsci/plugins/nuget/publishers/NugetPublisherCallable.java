@@ -15,7 +15,6 @@ import org.jenkinsci.plugins.nuget.Utils.NugetPublishCommand;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**

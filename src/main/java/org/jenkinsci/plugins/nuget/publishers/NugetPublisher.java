@@ -35,14 +35,16 @@ public class NugetPublisher extends Recorder {
     protected String publishPath;
     protected String nugetPublicationName;
     protected String packagesExclusionPattern;
+    protected boolean doNotFailIfNoPackagesArePublished;
 
     @DataBoundConstructor
-    public NugetPublisher(String name, String packagesPattern, String publishPath, String nugetPublicationName, String packagesExclusionPattern) {
+    public NugetPublisher(String name, String packagesPattern, String publishPath, String nugetPublicationName, String packagesExclusionPattern, boolean doNotFailIfNoPackagesArePublished) {
         this.name = name;
         this.packagesPattern = packagesPattern;
         this.publishPath = StringUtils.trim(publishPath);
         this.nugetPublicationName = nugetPublicationName;
         this.packagesExclusionPattern = packagesExclusionPattern;
+        this.doNotFailIfNoPackagesArePublished = doNotFailIfNoPackagesArePublished;
     }
 
     @Override
@@ -80,6 +82,9 @@ public class NugetPublisher extends Recorder {
     }
 
     private void checkErrors(List<PublicationResult> results) throws AbortException {
+        if (results.isEmpty() && !doNotFailIfNoPackagesArePublished) {
+            throw new AbortException("No packages were published.");
+        }
         for(PublicationResult result : results) {
             if (!result.isSuccess()) {
                 throw new AbortException("There were errors while publishing packages to NuGet.");
@@ -110,6 +115,10 @@ public class NugetPublisher extends Recorder {
 
     public String getNugetPublicationName() {
         return nugetPublicationName;
+    }
+
+    public boolean isDoNotFailIfNoPackagesArePublished() {
+        return doNotFailIfNoPackagesArePublished;
     }
 
     @Extension
