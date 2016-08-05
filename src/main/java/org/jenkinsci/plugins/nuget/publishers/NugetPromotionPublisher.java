@@ -51,8 +51,8 @@ public class NugetPromotionPublisher extends NugetPublisher {
     private static final String PROMOTION_CLASS_NAME = "hudson.plugins.promoted_builds.Promotion";
 
     @DataBoundConstructor
-    public NugetPromotionPublisher(String name, String packagesPattern, String publishPath, String nugetPublicationName, String packagesExclusionPattern, boolean useWorkspaceInPromotion) {
-        super(name, packagesPattern, publishPath, nugetPublicationName, packagesExclusionPattern);
+    public NugetPromotionPublisher(String name, String packagesPattern, String publishPath, String nugetPublicationName, String packagesExclusionPattern, boolean useWorkspaceInPromotion, boolean doNotFailIfNoPackagesArePublished) {
+        super(name, packagesPattern, publishPath, nugetPublicationName, packagesExclusionPattern, doNotFailIfNoPackagesArePublished);
         this.useWorkspaceInPromotion = useWorkspaceInPromotion;
     }
 
