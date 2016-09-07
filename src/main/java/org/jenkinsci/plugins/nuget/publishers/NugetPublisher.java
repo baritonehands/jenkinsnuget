@@ -14,7 +14,7 @@ import jenkins.model.GlobalConfiguration;
 import org.jenkinsci.plugins.nuget.Messages;
 import org.jenkinsci.plugins.nuget.NugetGlobalConfiguration;
 import org.jenkinsci.plugins.nuget.NugetPublication;
-import org.jenkinsci.plugins.nuget.Utils.Validations;
+import org.jenkinsci.plugins.nuget.utils.Validations;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.apache.commons.lang.StringUtils;

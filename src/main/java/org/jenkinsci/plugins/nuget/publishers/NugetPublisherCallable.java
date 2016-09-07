@@ -10,7 +10,7 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
 import org.jenkinsci.plugins.nuget.NugetGlobalConfiguration;
 import org.jenkinsci.plugins.nuget.NugetPublication;
-import org.jenkinsci.plugins.nuget.Utils.NugetPublishCommand;
+import org.jenkinsci.plugins.nuget.utils.NugetPublishCommand;
 
 import java.io.File;
 import java.io.IOException;

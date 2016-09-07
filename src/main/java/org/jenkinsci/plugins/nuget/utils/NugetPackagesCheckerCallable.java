@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.nuget.Utils;
+package org.jenkinsci.plugins.nuget.utils;
 
 import hudson.FilePath;
 import hudson.remoting.VirtualChannel;
