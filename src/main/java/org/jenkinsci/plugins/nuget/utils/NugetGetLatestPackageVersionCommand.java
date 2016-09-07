@@ -5,6 +5,7 @@ import hudson.Launcher;
 import hudson.util.ArgumentListBuilder;
 import org.jenkinsci.lib.xtrigger.XTriggerLog;
 import org.jenkinsci.plugins.nuget.NugetGlobalConfiguration;
+import org.jenkinsci.plugins.nuget.triggers.logs.TriggerLog;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,10 +19,10 @@ class NugetGetLatestPackageVersionCommand extends NugetCommandBase {
     private ForkingOutputStream fork;
     private final String packageName;
     private final boolean checkPrerelease;
-    private final XTriggerLog log;
+    private final TriggerLog log;
     private String version;
 
-    NugetGetLatestPackageVersionCommand(XTriggerLog log, NugetGlobalConfiguration configuration, FilePath workDir, String packageName, boolean checkPrerelease) {
+    NugetGetLatestPackageVersionCommand(TriggerLog log, NugetGlobalConfiguration configuration, FilePath workDir, String packageName, boolean checkPrerelease) {
         super(log.getListener(), configuration, workDir);
         this.log = log;
         this.packageName = packageName;

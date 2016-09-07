@@ -9,4 +9,7 @@
   <f:entry title="${%Prerelease}">
     <f:checkbox name="checkPrerelease" checked="${instance.checkPrerelease}"/>
   </f:entry>
+  <f:entry title="${%VerboseLogs}">
+    <f:checkbox name="useVerboseLogs" checked="${instance.useVerboseLogs}"/>
+  </f:entry>
 </j:jelly>
