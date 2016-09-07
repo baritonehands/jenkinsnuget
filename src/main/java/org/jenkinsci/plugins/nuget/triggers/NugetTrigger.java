@@ -7,7 +7,7 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.nuget.Messages;
 import org.jenkinsci.plugins.nuget.NugetCause;
 import org.jenkinsci.plugins.nuget.NugetGlobalConfiguration;
-import org.jenkinsci.plugins.nuget.Utils.NugetUpdater;
+import org.jenkinsci.plugins.nuget.utils.NugetUpdater;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Action;

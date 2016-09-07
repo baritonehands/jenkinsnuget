@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.nuget.Utils;
+package org.jenkinsci.plugins.nuget.utils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.taskdefs.Input;
