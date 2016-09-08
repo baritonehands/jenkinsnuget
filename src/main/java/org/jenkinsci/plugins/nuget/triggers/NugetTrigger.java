@@ -7,6 +7,9 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.nuget.Messages;
 import org.jenkinsci.plugins.nuget.NugetCause;
 import org.jenkinsci.plugins.nuget.NugetGlobalConfiguration;
+import org.jenkinsci.plugins.nuget.triggers.logs.InfoTriggerLog;
+import org.jenkinsci.plugins.nuget.triggers.logs.TriggerLog;
+import org.jenkinsci.plugins.nuget.triggers.logs.VerboseTriggerLog;
 import org.jenkinsci.plugins.nuget.utils.NugetUpdater;
 import hudson.Extension;
 import hudson.model.AbstractProject;
@@ -29,15 +32,21 @@ import org.kohsuke.stapler.DataBoundConstructor;
 public class NugetTrigger extends AbstractTrigger {
 
     private boolean checkPrerelease;
+    private boolean useVerboseLogs;
 
     @DataBoundConstructor
-    public NugetTrigger(String cronTabSpec, boolean checkPrerelease) throws ANTLRException {
+    public NugetTrigger(String cronTabSpec, boolean checkPrerelease, boolean useVerboseLogs) throws ANTLRException {
         super(cronTabSpec);
         this.checkPrerelease = checkPrerelease;
+        this.useVerboseLogs = useVerboseLogs;
     }
 
     public boolean getCheckPrerelease() {
         return checkPrerelease;
+    }
+
+    public boolean getUseVerboseLogs() {
+        return useVerboseLogs;
     }
 
     @Override
@@ -67,7 +76,8 @@ public class NugetTrigger extends AbstractTrigger {
         }
         AbstractProject project = (AbstractProject) job;
         NugetGlobalConfiguration configuration = GlobalConfiguration.all().get(NugetGlobalConfiguration.class);
-        NugetUpdater updater = new NugetUpdater(project.getSomeWorkspace(), configuration, checkPrerelease, xtl);
+        TriggerLog log = useVerboseLogs ? new VerboseTriggerLog(xtl) : new InfoTriggerLog(xtl);
+        NugetUpdater updater = new NugetUpdater(project.getSomeWorkspace(), configuration, checkPrerelease, log);
         return updater.performUpdate();
     }
 

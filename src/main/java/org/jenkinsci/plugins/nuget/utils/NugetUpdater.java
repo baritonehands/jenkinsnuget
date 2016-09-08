@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.jenkinsci.lib.xtrigger.XTriggerLog;
 import org.jenkinsci.plugins.nuget.NugetGlobalConfiguration;
+import org.jenkinsci.plugins.nuget.triggers.logs.TriggerLog;
 
 /**
  * @author bgregg
@@ -13,9 +14,9 @@ import org.jenkinsci.plugins.nuget.NugetGlobalConfiguration;
 public class NugetUpdater {
     private final FilePath solutionDir;
     private final NugetPackagesCheckerCallable nugetPackagesCheckerCallable;
-    private final XTriggerLog log;
+    private final TriggerLog log;
 
-    public NugetUpdater(FilePath solutionDir, NugetGlobalConfiguration configuration, boolean checkPrerelease, XTriggerLog log) {
+    public NugetUpdater(FilePath solutionDir, NugetGlobalConfiguration configuration, boolean checkPrerelease, TriggerLog log) {
         this.solutionDir = solutionDir;
         this.log = log;
         this.nugetPackagesCheckerCallable = new NugetPackagesCheckerCallable(configuration, checkPrerelease, log);
