@@ -5,12 +5,13 @@ import org.jenkinsci.lib.xtrigger.XTriggerLog;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Path;
 
 /**
  * @author Arnaud TAMAILLON
  */
-public interface TriggerLog {
+public interface TriggerLog extends Serializable {
 
     TaskListener getListener();
 
