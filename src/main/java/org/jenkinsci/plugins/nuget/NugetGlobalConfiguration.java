@@ -29,7 +29,6 @@ public class NugetGlobalConfiguration extends GlobalConfiguration implements Ser
     public NugetGlobalConfiguration() {
         super();
         load();
-        save();
     }
 
     public String getNugetExe() {
