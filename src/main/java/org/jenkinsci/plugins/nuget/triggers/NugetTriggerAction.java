@@ -1,16 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.jenkinsci.nuget;
+package org.jenkinsci.plugins.nuget.triggers;
 
 import hudson.Util;
 import hudson.console.AnnotatedLargeText;
-import hudson.model.AbstractProject;
 import hudson.model.Action;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+
+import hudson.model.BuildableItem;
 import org.apache.commons.jelly.XMLOutput;
 
 /**
@@ -18,16 +15,16 @@ import org.apache.commons.jelly.XMLOutput;
  * @author bgregg
  */
 public class NugetTriggerAction implements Action {
-    private transient AbstractProject<?, ?> job;
+    private transient BuildableItem job;
     private transient File logFile;
     
-    public NugetTriggerAction(AbstractProject<?, ?> job, File logFile) {
+    public NugetTriggerAction(BuildableItem job, File logFile) {
         this.job = job;
         this.logFile = logFile;
     }
     
     @SuppressWarnings("unused")
-    public AbstractProject<?, ?> getOwner() {
+    public BuildableItem getOwner() {
         return job;
     }
     
@@ -54,6 +51,6 @@ public class NugetTriggerAction implements Action {
 
     @SuppressWarnings("unused")
     public void writeLogTo(XMLOutput out) throws IOException {
-        new AnnotatedLargeText<NugetTriggerAction>(getLogFile(), Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());
+        new AnnotatedLargeText<>(getLogFile(), Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());
     }
 }

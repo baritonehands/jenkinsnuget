@@ -1,6 +1,8 @@
-<!--
-  This view is used to render the installed plugins page.
--->
+<?jelly escape-by-default='true'?>
 <div>
-  This plugin is to trigger a build when a NuGet dependency has an updated version.
+  This plugin allows to
+  <ul>
+    <li>trigger a build when a NuGet dependency has an updated version</li>
+    <li>publish NuGet packages to NuGet repositories using secured api keys</li>
+  </ul>
 </div>

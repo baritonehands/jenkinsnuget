@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 The MIT License
 
-Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+Copyright 2016 MFowler.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,25 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <l:layout>
-        <st:include it="${it.owner}" page="sidepanel.jelly"/>
-        <l:main-panel>
-            <h1>NuGet Trigger Log</h1>
-
-            <j:set var="log" value="${it.log}"/> 
-            <j:choose>
-                <j:when test="${empty(log)}">
-                    ${%Polling has not run yet.}
-                </j:when>
-                <j:otherwise>
-                    <pre>
-                        <st:getOutput var="output"/>
-                        <j:whitespace>${it.writeLogTo(output)}</j:whitespace>
-                    </pre>
-                </j:otherwise>
-            </j:choose>
-        </l:main-panel>
-    </l:layout>
+<?jelly escape-by-default='true'?>
+<!-- TODO add taglibs such as: xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" -->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:i="jelly:fmt" xmlns:f="/lib/form">
+    <j:set var="inPromotion" value="true"/>
+    <st:include page="config.jelly" class="${descriptor.publisherSuperclass}"/>
 </j:jelly>

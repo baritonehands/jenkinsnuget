@@ -1,0 +1,18 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:t="/lib/hudson">
+  <j:if test="${it.hasResults}">
+    <t:summary icon="icon-nuget" href="${it.urlName}" iconOnly="true">
+      <b>${it.displayName}:</b>
+      <ul style="margin-top:0">
+        <j:forEach var="result" items="${it.results}">
+          <li>
+            <j:choose>
+              <j:when test="${result.success}"><strong>${result.packageName}</strong> : ${%Success}</j:when>
+              <j:otherwise><span style="color:red"><strong>${result.packageName}</strong> : ${%Failure}</span></j:otherwise>
+            </j:choose>
+          </li>
+        </j:forEach>
+      </ul>
+    </t:summary>
+  </j:if>
+</j:jelly>
