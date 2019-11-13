@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>nuget</artifactId>
-  <version>0.8-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>hpi</packaging>
   <name>Jenkins Nuget Plugin</name>
   <description>NuGet package updates trigger Jenkins builds</description>
@@ -33,7 +33,7 @@
     <connection>scm:git:git://github.com/jenkinsci/nuget-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/nuget-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/nuget-plugin</url>
-    <tag>HEAD</tag>
+    <tag>nuget-1.0</tag>
   </scm>
   
   <developers>
