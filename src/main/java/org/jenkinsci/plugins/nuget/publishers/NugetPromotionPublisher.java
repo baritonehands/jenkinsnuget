@@ -37,7 +37,6 @@ import org.jenkinsci.plugins.nuget.Messages;
 import org.jenkinsci.plugins.nuget.NugetPublication;
 import org.jenkinsci.plugins.nuget.utils.Validations;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
 
 import org.kohsuke.stapler.QueryParameter;
 
@@ -56,7 +55,6 @@ public class NugetPromotionPublisher extends NugetPublisher {
         this.useWorkspaceInPromotion = useWorkspaceInPromotion;
     }
 
-    @DataBoundSetter
     public boolean getUseWorkspaceInPromotion() {
         return useWorkspaceInPromotion;
     }
