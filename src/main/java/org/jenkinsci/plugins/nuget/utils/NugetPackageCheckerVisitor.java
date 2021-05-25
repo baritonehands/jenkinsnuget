@@ -1,8 +1,8 @@
 package org.jenkinsci.plugins.nuget.utils;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import hudson.FilePath;
-import org.jenkinsci.lib.xtrigger.XTriggerLog;
 import org.jenkinsci.plugins.nuget.NugetGlobalConfiguration;
 import org.jenkinsci.plugins.nuget.triggers.logs.TriggerLog;
 import org.w3c.dom.Document;
@@ -18,7 +18,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -43,7 +42,9 @@ class NugetPackageCheckerVisitor extends SimpleFileVisitor<Path> {
         this.configuration = configuration;
         this.preReleaseChecked = preReleaseChecked;
         this.workspaceRoot = workspaceRoot;
-        builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        builder = factory.newDocumentBuilder();
     }
 
     @Override
@@ -100,5 +101,10 @@ class NugetPackageCheckerVisitor extends SimpleFileVisitor<Path> {
         NugetGetLatestPackageVersionCommand command = new NugetGetLatestPackageVersionCommand(log, configuration, workspaceRoot, packageName, preReleaseChecked);
         command.execute();
         return command.getVersion();
+    }
+
+    @VisibleForTesting
+    public Map<String, String> getLatestPackageVersions() {
+        return latestPackageVersions;
     }
 }
