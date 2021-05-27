@@ -18,6 +18,7 @@ import hudson.model.Node;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 import org.jenkinsci.lib.xtrigger.AbstractTrigger;
 import org.jenkinsci.lib.xtrigger.XTriggerDescriptor;
@@ -51,6 +52,7 @@ public class NugetTrigger extends AbstractTrigger {
 
     @Override
     protected File getLogFile() {
+        Objects.requireNonNull(job, "job");
         return new File(job.getRootDir(), "nuget-polling.log");
     }
 
