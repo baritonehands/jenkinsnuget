@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.nuget.triggers;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Util;
 import hudson.console.AnnotatedLargeText;
 import hudson.model.Action;
@@ -50,6 +51,7 @@ public class NugetTriggerAction implements Action {
     }
 
     @SuppressWarnings("unused")
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED")
     public void writeLogTo(XMLOutput out) throws IOException {
         new AnnotatedLargeText<>(getLogFile(), Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());
     }
